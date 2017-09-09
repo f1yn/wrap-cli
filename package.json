@@ -1,0 +1,16 @@
+{
+  "name": "wrap-cli",
+  "version": "0.0.1",
+  "description": "A npm cli for wraping factory functions in flynn-module-es5 format",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flynnham/wrap-cli.git"
+  },
+  "author": "Flynn Buckingham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flynnham/wrap-cli/issues"
+  },
+  "homepage": "https://github.com/flynnham/wrap-cli#readme"
+}
