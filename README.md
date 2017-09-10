@@ -28,7 +28,7 @@ To use the script, embed it into the `scripts` portion of you package.json as su
 ```
 
 Inside of your factory/constructor script, wrap the start and end of the constructor with `/*__START_WRAP__*/` and `/*__END_WRAP__*/`.
-This is required, as it's how the wrapper tells difference between constructor and other module code.
+This is required, as it's how the wrapper tells the difference between constructor and other module code.
 
 **Unfortunately, right now a glob implementation has not been added, so the wrapper can only process an individual file per
 instance**.
