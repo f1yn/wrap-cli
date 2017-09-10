@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/flynnham/wrap-cli/issues"
   },
-  "homepage": "https://github.com/flynnham/wrap-cli#readme"
+  "homepage": "https://github.com/flynnham/wrap-cli#readme",
+  "dependencies": {
+    "js-beautify": "^1.6.14"
+  }
 }

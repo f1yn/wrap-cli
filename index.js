@@ -23,7 +23,8 @@ const options = (args => {
         removeTrailing: true,
         injectSelfConsole: true,
         templatePath: './template/1.js',
-        es2015: false
+        es2015: false,
+        beautify: true
     };
 
     let i = args.length;
@@ -40,9 +41,12 @@ const options = (args => {
                 break;
             case '--preserve-console':
                 config.injectSelfConsole = false;
-                break
+                break;
             case '--es2015':
                 config.es2015 = true;
+                break;
+            case '--ugly':
+                config.beautify = false;
                 break;
         }
     }
@@ -72,68 +76,91 @@ if (typeof template !== "string"){
 }
 
 //now we will begin processing the factory function
-let factory = (() => {
-    let output = null;
+let segments = (() => {
+    let rawText = null;
 
     // attempt to load the sourceFilelet output = null;
     try {
         // ToDO: consider adding ability to define custom templates
-        output = fs.readFileSync(filePath, 'utf8');
+        rawText = fs.readFileSync(filePath, 'utf8');
     } catch (e){
         // do nothing, since the null variable will be doing that for us.
     }
 
-    if (output){
+    let output = {};
+
+    if (rawText){
         // there is data to process
 
-        if (options.removeFirstVar){
-            if (options.es2015) {
-                output = output.replace(/(const)(.*)(function)/, 'function'); // replace first instance of function;
-            } else {
-                output = output.replace(/(var)(.*)(function)/, 'function'); // replace first instance of function;
+        // search for instance of
+        const START_TAG = '/*__START_WRAP__*/';
+        const END_TAG = '/*__END_WRAP__*/';
+        const START_INDEX = rawText.indexOf(START_TAG);
+        const END_INDEX = rawText.indexOf(END_TAG);
+
+        console.warn(START_INDEX, END_INDEX)
+
+        if (START_INDEX > -1 && END_INDEX > START_INDEX){
+            // the factory needs to be wrapped
+
+            output.outer  = rawText.slice(0, START_INDEX); // the code surrounded by the wrap (and whatever is left over)
+            let factoryCode= rawText.slice(START_INDEX, END_INDEX); // the code not surrounded by the wrap
+
+            rawText = null; // clear the rawText
+
+            if (options.removeFirstVar){
+                factoryCode = factoryCode.replace(/(const|let|var)(.*)(function)/, 'function'); // replace first instance of function;
             }
-        }
 
-        if (options.removeTrailing){
-            let checkTimes = 3;
-
-            while (checkTimes--){
-                if (output[output.length - 1] === ';'){
-                    output = output.substr(0, output.length - 1);
-                    // remove the trailing semicolon
-                }
+            if (options.removeTrailing){
+                let lastBracket = factoryCode.lastIndexOf('}');
+                factoryCode = factoryCode.substr(0, lastBracket + 1);
             }
-        }
 
-        if (options.injectSelfConsole){
-            // replace all instances of console.log, console.error, console.warn with __self__ module reference
-            output = output.replace(/console\.log/g, '__self__.log');
-            output = output.replace(/console\.warn/g, '__self__.warn');
-            output = output.replace(/console\.error/g, '__self__.error');
+            if (options.injectSelfConsole){
+                // replace all instances of console.log, console.error, console.warn with __self__ module reference
+                factoryCode = factoryCode
+                    .replace(/console\.log/g, '__self__.log')
+                    .replace(/console\.warn/g, '__self__.warn')
+                    .replace(/console\.error/g, '__self__.error');
+            }
+
+            output.factory = factoryCode;
+        } else {
+            // it can't be processed
+            output = null;
         }
     }
 
     return output;
 })();
 
-if (typeof factory !== "string"){
+if (typeof segments !== "object" || segments == null){
     console.error(LOG_NAME, 'CRITICAL:', 'factory (source) not found or unable to be parsed. Aborting');
     return new Error('invalid source path'); // error
 }
 
 const REPLACE_NAME = '/#@#_MODULE_NAME_#@#/';
+const REPLACE_OUTER = '/#@#_MODULE_OUTER_#@#/';
 const REPLACE_FACTORY = '/#@#_MODULE_FACTORY_#@#/';
 
 // do the replace (try to recycle the already existent variables)
 
-factory = template.replace(REPLACE_FACTORY, factory); // wrap the factory.
-factory = factory.replace(REPLACE_NAME, moduleName);
+let output = template
+    .replace(REPLACE_NAME, moduleName)
+    .replace(REPLACE_OUTER, segments.outer)
+    .replace(REPLACE_FACTORY, segments.factory)// wrap the factory.
+
+if (options.beautify){
+    const tidy = require('js-beautify').js_beautify;
+    output = tidy(output, { indent_size: 4, jslint_happy: true });
+}
 
 if (options.passthrough){
     // return the value
-    return factory;
+    return output;
 } else {
     // log it to the console
-    console.log(factory);
+    console.log(output);
     return 0;
 }

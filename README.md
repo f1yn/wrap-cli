@@ -27,6 +27,9 @@ To use the script, embed it into the `scripts` portion of you package.json as su
 }
 ```
 
+Inside of your factory/constructor script, wrap the start and end of the constructor with `/*__START_WRAP__*/` and `/*__END_WRAP__*/`.
+This is required, as it's how the wrapper tells difference between constructor and other module code.
+
 **Unfortunately, right now a glob implementation has not been added, so the wrapper can only process an individual file per
 instance**.
 
@@ -36,7 +39,10 @@ instance**.
 Prevents the cli from replacing instances of `console.log`, `console.warn`, and `console.error` with `__self__.[method]`
 
 #### `--preserve-trailing`
-Prevents the removal the last 3 instances of semicolons found in the converted factory.
+Prevents the removal of characters exceeding the last bracket.
 
 #### `--preserve-var`
 Prevents the wrapper from removing the first instance of `var` from the factory.
+
+#### `--ugly`
+Prevents the beautification of the output script.
