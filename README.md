@@ -12,7 +12,7 @@ To install, include this git repository as a dependency for your npm project and
   }
 }
 ```
-There are no run-time dependencies besides Node.js.
+
 
 The package then be automatically fetched from git. The package will automatically update when using `npm update`.
 
