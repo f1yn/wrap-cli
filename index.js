@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 const fs = require('fs');
 const path = require('path');
 
@@ -57,7 +58,7 @@ const template = (() => {
 
     try {
         // ToDO: consider adding ability to define custom templates
-        output = fs.readFileSync(templatePath, 'utf8');
+        output = fs.readFileSync(path.join(__dirname, templatePath), 'utf8');
     } catch (e){
         console.error(templatePath)
         // do nothing, since the null variable will be doing that for us.
@@ -77,7 +78,7 @@ let factory = (() => {
     // attempt to load the sourceFilelet output = null;
     try {
         // ToDO: consider adding ability to define custom templates
-        output = fs.readFileSync(path.join(__dirname, filePath), 'utf8');
+        output = fs.readFileSync(filePath, 'utf8');
     } catch (e){
         // do nothing, since the null variable will be doing that for us.
     }
