@@ -21,7 +21,8 @@ const options = (args => {
         removeFirstVar: true,
         removeTrailing: true,
         injectSelfConsole: true,
-        templatePath: './template/1.js'
+        templatePath: './template/1.js',
+        es2015: false
     };
 
     let i = args.length;
@@ -39,6 +40,9 @@ const options = (args => {
             case '--preserve-console':
                 config.injectSelfConsole = false;
                 break
+            case '--es2015':
+                config.es2015 = true;
+                break;
         }
     }
     return config;
@@ -82,7 +86,11 @@ let factory = (() => {
         // there is data to process
 
         if (options.removeFirstVar){
-            output = output.replace(/(var)(.*)(function)/, 'function'); // replace first instance of function;
+            if (options.es2015) {
+                output = output.replace(/(const)(.*)(function)/, 'function'); // replace first instance of function;
+            } else {
+                output = output.replace(/(var)(.*)(function)/, 'function'); // replace first instance of function;
+            }
         }
 
         if (options.removeTrailing){
