@@ -7,7 +7,7 @@ const optionalArgs = process.argv.splice(2); // get optional arguments
 const filePath = optionalArgs.shift(); // get file-path (if it exists)
 const moduleName = optionalArgs.shift(); // get module-name (if it exists)
 
-const LOG_NAME = '[flynn-modulizer-cli]';
+const LOG_NAME = '[wrap-cli]';
 
 // check that two required args are available
 if (typeof filePath !== "string" || typeof moduleName !== "string"){
