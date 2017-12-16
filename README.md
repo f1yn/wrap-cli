@@ -1,5 +1,5 @@
 # wrap-cli
-A npm cli for wrapping factory functions in a [wrap-es5]() module.
+A npm cli for wrapping factory functions in a [wrap-es5](https://github.com/flynnham/wrap-es5) module.
 
 ## Installation
 
